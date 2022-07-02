@@ -1,31 +1,77 @@
-# слово написано по-русски, но некоторые буквы затесались английские (похожие на русские). Заменить их.
-# NB: в русском алфавите 12 букв, совпадающих по написанию с латинскими. 
 
-import re
-DICT_LETTERS = {'A': 'А', 'B': 'В', 'C': 'С', 'E': 'Е', 'H': 'Н', 'K': 'К', 'M': 'М', 'O': 'О', 'P': 'Р',
-                'T': 'Т', 'X': 'Х', 'a': 'а', 'c': 'с', 'e': 'е', 'o': 'о', 'p': 'р', 'x': 'х', 'y': 'у'}
+ENG_ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+                'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+RUS_ALPHABET = ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П',
+                'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я']
+ENG_ESPECIAL = ['A', 'B', 'C', 'E', 'H', 'K', 'M', 'O', 'P', 'T', 'X',
+                'a', 'c', 'e', 'o', 'p', 'x', 'y']
+RUS_ESPECIAL = ['А', 'В', 'С', 'Е', 'Н', 'К', 'М', 'О', 'Р', 'Т', 'Х',
+                'а', 'с', 'е', 'о', 'р', 'х', 'у']
 
 
-def change(word):
-    
-    # print(*[f'{ord(key)}:{ord(DICT_LETTERS[key])}' for key in DICT_LETTERS])
-    new_word = word
+# Функция проверки слов:
+# на вход подаётся слово; функция проверяет, все ли символы относятся к буквам одного алфавита.
+
+def check_first(word):
+    word = word.upper()
+    if set(word).issubset(ENG_ALPHABET):
+        return 'eng'
+    elif set(word).issubset(RUS_ALPHABET):
+        return 'rus'
+    else:
+        return 'other'
+
+
+# Функция проверки слов:
+# в слове несколько букв на одном языке, и несколько - на другом; определяем, из какого языка слово (предположительно).
+
+def check_next(word):
+    letter_eng = []
+    letter_rus = []
     for letter in word:
-        if re.search(r'[a-z]', letter.lower()):
-            # print(ord(letter))
-            try:
-                new_word = new_word.replace(letter, DICT_LETTERS[letter])
-            except:
-                print('Сочетание букв кириллицы и латиницы: некоторые буквы не удалось перевести.')
+        if letter.upper() in ENG_ALPHABET:
+            letter_eng.append(letter)
+        if letter.upper() in RUS_ALPHABET:
+            letter_rus.append(letter)
+    if set(letter_eng).issubset(ENG_ESPECIAL):
+        return 'rus'
+    elif set(letter_rus).issubset(RUS_ESPECIAL):
+        return 'eng'
+    else:
+        return 'other'
+
+
+# Cлово написано по-русски, но некоторые буквы затесались английские (похожие на русские). Заменить их.
+
+def change(word, lang='eng'):
+    if lang == 'eng':
+        print(f'{lang=}')
+        lst_1 = RUS_ESPECIAL
+        lst_2 = ENG_ESPECIAL
+    elif lang == 'rus':
+        print(f'{lang=}')
+        lst_1 = ENG_ESPECIAL
+        lst_2 = RUS_ESPECIAL
+    else:
+        print('Некоторые буквы не удаётся перевести. Проверьте слово.')
+        return word
+    new_word = word
+    for i, letter in enumerate(word):
+        if letter in lst_1:
+            new_word = new_word.replace(letter, lst_2[lst_1.index(letter)])
     return new_word
 
-
-word_ = 'CША'
-# word_ = 'PAБOTA'
-# word_ = paбoтa
-# word_ = 'paбota'
-print(word_)
-print(*[f'{letter}:{ord(letter)}' for letter in word_])
-changed_word = change(word_)
-print(changed_word)
-print(*[f'{letter}:{ord(letter)}' for letter in changed_word])
+text = 'Cлово написано по-русски, но некоторые буквы затесались английские ' \
+       '(похожие на русские). Заменить их. CША США USА cша PAБOTA paбoтa paбota'
+text = text.split()
+# print(text)
+for word_ in text:
+    print(word_)
+    print(check_first(word_))
+    language = check_next(word_)
+    print(language)
+    print(*[f'{letter}:{ord(letter)}' for letter in word_])
+    changed_word = change(word_, language)
+    print(changed_word)
+    print(*[f'{letter}:{ord(letter)}' for letter in changed_word])
+    input()
