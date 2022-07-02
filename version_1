@@ -1,0 +1,31 @@
+# слово написано по-русски, но некоторые буквы затесались английские (похожие на русские). Заменить их.
+# NB: в русском алфавите 12 букв, совпадающих по написанию с латинскими. 
+
+import re
+
+
+def change(word):
+    DICT_LETTERS = {'A': 'А', 'B': 'В', 'C': 'С', 'E': 'Е', 'H': 'Н', 'K': 'К', 'M': 'М', 'O': 'О', 'P': 'Р',
+                    'T': 'Т', 'X': 'Х', 'a': 'а', 'c': 'с', 'e': 'е', 'o': 'о', 'p': 'р', 'x': 'х', 'y': 'у'}
+
+    # print(*[f'{ord(key)}:{ord(DICT_LETTERS[key])}' for key in DICT_LETTERS])
+    new_word = word
+    for letter in word:
+        if re.search(r'[a-z]', letter.lower()):
+            # print(ord(letter))
+            try:
+                new_word = new_word.replace(letter, DICT_LETTERS[letter])
+            except:
+                print('Сочетание букв кириллицы и латиницы: некоторые буквы не удалось перевести.')
+    return new_word
+
+
+word_ = 'CША'
+# word_ = 'PAБOTA'
+# word_ = paбoтa
+# word_ = 'paбota'
+print(word_)
+print(*[f'{letter}:{ord(letter)}' for letter in word_])
+changed_word = change(word_)
+print(changed_word)
+print(*[f'{letter}:{ord(letter)}' for letter in changed_word])
